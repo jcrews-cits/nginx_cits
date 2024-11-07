@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write  # Grants permission to create releases and modify repository content
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -50,18 +53,19 @@ jobs:
 
       - name: Package NGINX with FPM
         run: |
-          fpm -s dir -t deb -n nginx -v $VERSION -C /usr/local/nginx .
+          fpm -s dir -t deb -n nginx -v $VERSION -C /usr/local/nginx -p nginx-$VERSION.deb
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: nginx-package-$VERSION
-          path: "*.deb"
+          name: "nginx-$VERSION.deb"
+          path: "nginx-$VERSION.deb"  # Matches the name created by fpm
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
+        id: create_release  # ID for reference in the next step
+        uses: actions/create-release@v3
         with:
           tag_name: "v$VERSION"
           release_name: "NGINX v$VERSION"
@@ -74,8 +78,8 @@ jobs:
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: "*.deb"  # Path to the generated package file
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "nginx-$VERSION.deb"  # Path to the generated package file
           asset_name: "nginx-$VERSION.deb"  # Naming the asset with version number
           asset_content_type: application/octet-stream
         env:
