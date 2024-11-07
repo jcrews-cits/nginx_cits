@@ -1,0 +1,52 @@
+name: Build NGINX Package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libpcre3 libpcre3-dev zlib1g zlib1g-dev libssl-dev ruby ruby-dev
+          sudo gem install fpm
+
+      - name: Download NGINX source code
+        run: |
+          curl -O http://nginx.org/download/nginx-1.24.0.tar.gz
+          tar -xzvf nginx-1.24.0.tar.gz
+          cd nginx-1.24.0
+
+      - name: Configure NGINX
+        run: |
+          cd nginx-1.24.0
+          ./configure --prefix=/usr/local/nginx --with-http_ssl_module --with-http_v2_module
+
+      - name: Build NGINX
+        run: |
+          cd nginx-1.24.0
+          make
+          sudo make install
+
+      - name: Package NGINX with FPM
+        run: |
+          fpm -s dir -t deb -n nginx -v 1.24.0 -C /usr/local/nginx .
+        env:
+          PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+      - name: Upload Package Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: nginx-package
+          path: *.deb  # Use *.rpm if you're building for a Red Hat system
