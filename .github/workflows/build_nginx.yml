@@ -88,7 +88,6 @@ jobs:
             --with-http_image_filter_module=dynamic \
             --with-http_xslt_module=dynamic \
             --with-http_perl_module=dynamic \
-            --add-dynamic-module=modules/ngx_http_js_module \
             --add-dynamic-module=modules/ngx_http_otel_module
 
 
