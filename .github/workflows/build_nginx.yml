@@ -34,7 +34,7 @@ jobs:
 
       - name: Download NGINX source code
         run: |
-          echo "Downloading NGINX version: ${{ VERSION }}"
+          echo "Downloading NGINX version: $VERSION"
           curl -f -O http://nginx.org/download/nginx-$VERSION.tar.gz || { echo "Failed to download NGINX version $VERSION"; exit 1; }
           ls -l nginx-$VERSION.tar.gz
           file nginx-$VERSION.tar.gz
