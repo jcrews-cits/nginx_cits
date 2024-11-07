@@ -54,7 +54,7 @@ jobs:
       - name: Package NGINX with FPM
         run: |
           cd /usr/local/nginx
-          fpm -s dir -t deb -n nginx -v ${VERSION} -C /usr/local/nginx -p nginx-${VERSION}.deb
+          fpm -s dir -t deb -n nginx -v ${VERSION} -C /usr/local/nginx -p nginx-${VERSION}.deb .
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
