@@ -96,15 +96,15 @@ jobs:
           sudo make install
 
       - name: Set Permissions for NGINX Directory
-        run: sudo chmod -R 755 /usr/local/nginx
+        run: sudo chmod -R 755 /etc/nginx
 
       - name: Create Temporary Directory
         run: mkdir -p /home/runner/work/nginx_plus/nginx_plus/tmp
 
       - name: Package NGINX with FPM
         run: |
-          cd /usr/local/nginx
-          sudo fpm -s dir -t deb -n nginx -v ${VERSION} -C /usr/local/nginx -p /home/runner/work/nginx_plus/nginx_plus/nginx-${VERSION}.deb .
+          cd /etc/nginx
+          sudo fpm -s dir -t deb -n nginx -v ${VERSION} -C /etc/nginx -p /home/runner/work/nginx_plus/nginx_plus/nginx-${VERSION}.deb .
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
           TMPDIR: /home/runner/work/nginx_plus/nginx_plus/tmp
