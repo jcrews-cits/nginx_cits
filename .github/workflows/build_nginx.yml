@@ -51,12 +51,19 @@ jobs:
           make
           sudo make install
 
+      - name: Set Permissions for NGINX Directory
+        run: sudo chmod -R 755 /usr/local/nginx
+
+      - name: Create Temporary Directory
+        run: mkdir -p /home/runner/work/nginx_plus/nginx_plus/tmp
+
       - name: Package NGINX with FPM
         run: |
           cd /usr/local/nginx
-          fpm -s dir -t deb -n nginx -v ${VERSION} -C /usr/local/nginx -p nginx-${VERSION}.deb .
+          sudo fpm -s dir -t deb -n nginx -v ${VERSION} -C /usr/local/nginx -p nginx-${VERSION}.deb .
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          TMPDIR: /home/runner/work/nginx_plus/nginx_plus/tmp
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3
