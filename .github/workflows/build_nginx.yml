@@ -53,35 +53,35 @@ jobs:
 
       - name: Package NGINX with FPM
         run: |
-          fpm -s dir -t deb -n nginx -v $VERSION -C /usr/local/nginx -p nginx-$VERSION.deb
+          cd /usr/local/nginx
+          fpm -s dir -t deb -n nginx -v ${VERSION} -C /usr/local/nginx -p nginx-${VERSION}.deb
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: "nginx-$VERSION.deb"
-          path: "nginx-$VERSION.deb"  # Matches the name created by fpm
+          name: "nginx-${{ env.VERSION }}.deb"
+          path: "nginx-${{ env.VERSION }}.deb"  # Matches the name created by fpm
 
       - name: Create GitHub Release
         id: create_release  # ID for reference in the next step
         uses: actions/create-release@v1
         with:
-          tag_name: v{{$VERSION}}
-          release_name: NGINX v${{VERSION}}
-          body: Release of NGINX version ${{VERSION}}
+          tag_name: v${{ env.VERSION }}
+          release_name: NGINX v${{ env.VERSION }}
+          body: Release of NGINX version ${{ env.VERSION }}
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: nginx-${{ VERSION }}.deb  # Path to the generated package file
-          asset_name: nginx-${{ VERSION }}.deb  # Naming the asset with version number
+          asset_path: nginx-${{ env.VERSION }}.deb  # Path to the generated package file
+          asset_name: nginx-${{ env.VERSION }}.deb  # Naming the asset with version number
           asset_content_type: application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
