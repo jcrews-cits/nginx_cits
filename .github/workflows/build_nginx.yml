@@ -67,9 +67,9 @@ jobs:
         id: create_release  # ID for reference in the next step
         uses: actions/create-release@v1
         with:
-          tag_name: "v$VERSION"
-          release_name: "NGINX v$VERSION"
-          body: "Release of NGINX version ${{ VERSION }}"
+          tag_name: v{{$VERSION}}
+          release_name: NGINX v${{VERSION}}
+          body: Release of NGINX version ${{VERSION}}
           draft: false
           prerelease: false
         env:
@@ -80,8 +80,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: "nginx-${{ VERSION }}.deb"  # Path to the generated package file
-          asset_name: "nginx-${{ VERSION }}.deb"  # Naming the asset with version number
+          asset_path: nginx-${{ VERSION }}.deb  # Path to the generated package file
+          asset_name: nginx-${{ VERSION }}.deb  # Naming the asset with version number
           asset_content_type: application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
