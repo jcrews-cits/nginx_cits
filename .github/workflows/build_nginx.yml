@@ -67,8 +67,8 @@ jobs:
         id: create_release  # ID for reference in the next step
         uses: actions/create-release@v1
         with:
-          tag_name: "v${{ VERSION }}"
-          release_name: "NGINX v${{ VERSION }}"
+          tag_name: "v$VERSION"
+          release_name: "NGINX v$VERSION"
           body: "Release of NGINX version ${{ VERSION }}"
           draft: false
           prerelease: false
