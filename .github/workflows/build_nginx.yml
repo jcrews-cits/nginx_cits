@@ -18,7 +18,10 @@ jobs:
 
       - name: Read version from file
         id: read_version
-        run: echo "VERSION=\"$(cat VERSION)\"" >> $GITHUB_ENV
+        run: |
+          VERSION=$(cat VERSION)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Version read from file: $VERSION"  # Print the version to verify
 
       - name: Install Dependencies
         run: |
@@ -28,10 +31,12 @@ jobs:
 
       - name: Download NGINX source code
         run: |
-          curl -O http://nginx.org/download/nginx-$VERSION.tar.gz
-          tar -xzvf nginx-$VERSION.tar.gz
-          cd nginx-$VERSION
-
+          echo "Downloading NGINX version: $VERSION"
+          curl -f -O http://nginx.org/download/nginx-$VERSION.tar.gz || { echo "Failed to download NGINX version $VERSION"; exit 1; }
+          ls -l nginx-$VERSION.tar.gz
+          file nginx-$VERSION.tar.gz
+          tar -xzvf nginx-$VERSION.tar.gz || { echo "Extraction failed"; exit 1; }
+      
       - name: Configure NGINX
         run: |
           cd nginx-$VERSION
@@ -50,7 +55,7 @@ jobs:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
       - name: Upload Package Artifact
-        uses: actions/upload-artifact@v3  # Updated to v3
+        uses: actions/upload-artifact@v3
         with:
           name: nginx-package-$VERSION
           path: "*.deb"
