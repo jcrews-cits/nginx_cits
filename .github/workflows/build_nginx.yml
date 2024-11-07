@@ -16,6 +16,10 @@ jobs:
       - name: Check out the code
         uses: actions/checkout@v2
 
+      - name: Read version from file
+        id: read_version
+        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
+
       - name: Install Dependencies
         run: |
           sudo apt-get update
@@ -24,29 +28,29 @@ jobs:
 
       - name: Download NGINX source code
         run: |
-          curl -O http://nginx.org/download/nginx-1.24.0.tar.gz
-          tar -xzvf nginx-1.24.0.tar.gz
-          cd nginx-1.24.0
+          curl -O http://nginx.org/download/nginx-${{ env.VERSION }}.tar.gz
+          tar -xzvf nginx-${{ env.VERSION }}.tar.gz
+          cd nginx-${{ env.VERSION }}
 
       - name: Configure NGINX
         run: |
-          cd nginx-1.24.0
+          cd nginx-${{ env.VERSION }}
           ./configure --prefix=/usr/local/nginx --with-http_ssl_module --with-http_v2_module
 
       - name: Build NGINX
         run: |
-          cd nginx-1.24.0
+          cd nginx-${{ env.VERSION }}
           make
           sudo make install
 
       - name: Package NGINX with FPM
         run: |
-          fpm -s dir -t deb -n nginx -v 1.24.0 -C /usr/local/nginx .
+          fpm -s dir -t deb -n nginx -v ${{ env.VERSION }} -C /usr/local/nginx .
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: nginx-package
-          path: *.deb  # Use *.rpm if you're building for a Red Hat system
+          name: nginx-package-${{ env.VERSION }}
+          path: *.deb
