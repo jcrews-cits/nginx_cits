@@ -65,7 +65,7 @@ jobs:
 
       - name: Create GitHub Release
         id: create_release  # ID for reference in the next step
-        uses: actions/create-release@v3
+        uses: actions/create-release@v1
         with:
           tag_name: "v$VERSION"
           release_name: "NGINX v$VERSION"
