@@ -60,16 +60,20 @@ jobs:
       - name: Package NGINX with FPM
         run: |
           cd /usr/local/nginx
-          sudo fpm -s dir -t deb -n nginx -v ${VERSION} -C /usr/local/nginx -p nginx-${VERSION}.deb .
+          sudo fpm -s dir -t deb -n nginx -v ${VERSION} -C /usr/local/nginx -p /home/runner/work/nginx_plus/nginx_plus/nginx-${VERSION}.deb .
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
           TMPDIR: /home/runner/work/nginx_plus/nginx_plus/tmp
+
+      - name: Check if .deb Package Exists
+        run: |
+          ls -l /home/runner/work/nginx_plus/nginx_plus/nginx-${{ env.VERSION }}.deb || { echo "Package not found"; exit 1; }
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3
         with:
           name: "nginx-${{ env.VERSION }}.deb"
-          path: "nginx-${{ env.VERSION }}.deb"  # Matches the name created by fpm
+          path: "/home/runner/work/nginx_plus/nginx_plus/nginx-${{ env.VERSION }}.deb"
 
       - name: Create GitHub Release
         id: create_release  # ID for reference in the next step
@@ -87,8 +91,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: nginx-${{ env.VERSION }}.deb  # Path to the generated package file
-          asset_name: nginx-${{ env.VERSION }}.deb  # Naming the asset with version number
+          asset_path: /home/runner/work/nginx_plus/nginx_plus/nginx-${{ env.VERSION }}.deb
+          asset_name: nginx-${{ env.VERSION }}.deb
           asset_content_type: application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
