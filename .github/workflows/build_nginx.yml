@@ -50,7 +50,7 @@ jobs:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
       - name: Upload Package Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3  # Updated to v3
         with:
           name: nginx-package-$VERSION
           path: "*.deb"
