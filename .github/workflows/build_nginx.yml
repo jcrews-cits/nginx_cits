@@ -18,7 +18,7 @@ jobs:
 
       - name: Read version from file
         id: read_version
-        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=\"$(cat VERSION)\"" >> $GITHUB_ENV
 
       - name: Install Dependencies
         run: |
