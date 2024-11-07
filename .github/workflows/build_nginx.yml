@@ -28,29 +28,29 @@ jobs:
 
       - name: Download NGINX source code
         run: |
-          curl -O http://nginx.org/download/nginx-${{ env.VERSION }}.tar.gz
-          tar -xzvf nginx-${{ env.VERSION }}.tar.gz
-          cd nginx-${{ env.VERSION }}
+          curl -O http://nginx.org/download/nginx-$VERSION.tar.gz
+          tar -xzvf nginx-$VERSION.tar.gz
+          cd nginx-$VERSION
 
       - name: Configure NGINX
         run: |
-          cd nginx-${{ env.VERSION }}
+          cd nginx-$VERSION
           ./configure --prefix=/usr/local/nginx --with-http_ssl_module --with-http_v2_module
 
       - name: Build NGINX
         run: |
-          cd nginx-${{ env.VERSION }}
+          cd nginx-$VERSION
           make
           sudo make install
 
       - name: Package NGINX with FPM
         run: |
-          fpm -s dir -t deb -n nginx -v ${{ env.VERSION }} -C /usr/local/nginx .
+          fpm -s dir -t deb -n nginx -v $VERSION -C /usr/local/nginx .
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: nginx-package-${{ env.VERSION }}
-          path: *.deb
+          name: nginx-package-$VERSION
+          path: "*.deb"
