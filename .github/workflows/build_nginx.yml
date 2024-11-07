@@ -44,22 +44,23 @@ jobs:
         run: |
           cd nginx-$VERSION
           ./configure \
+            --with-cc-opt='-g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/build/nginx-z26Olq/nginx-1.27.1=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=/build/nginx-z26Olq/nginx-1.27.1=/usr/src/nginx-1.27.1-1+ubuntu24.04.1+deb.sury.org+1 -fPIC -Wdate-time -D_FORTIFY_SOURCE=3' \
+            --with-ld-opt='-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -Wl,-z,relro -Wl,-z,now -fPIC' \
             --prefix=/etc/nginx \
-            --sbin-path=/usr/sbin/nginx \
-            --modules-path=/usr/lib/nginx/modules \
             --conf-path=/etc/nginx/nginx.conf \
-            --error-log-path=/var/log/nginx/error.log \
             --http-log-path=/var/log/nginx/access.log \
-            --pid-path=/var/run/nginx.pid \
-            --lock-path=/var/run/nginx.lock \
-            --http-client-body-temp-path=/var/cache/nginx/client_temp \
-            --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
-            --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
-            --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
-            --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
-            --user=nginx \
-            --group=nginx \
+            --error-log-path=stderr \
+            --lock-path=/var/lock/nginx.lock \
+            --pid-path=/run/nginx.pid \
+            --modules-path=/usr/lib/nginx/modules \
+            --http-client-body-temp-path=/var/lib/nginx/body \
+            --http-fastcgi-temp-path=/var/lib/nginx/fastcgi \
+            --http-proxy-temp-path=/var/lib/nginx/proxy \
+            --http-scgi-temp-path=/var/lib/nginx/scgi \
+            --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
             --with-compat \
+            --with-debug \
+            --with-pcre-jit \
             --with-file-aio \
             --with-threads \
             --with-http_addition_module \
@@ -78,16 +79,17 @@ jobs:
             --with-http_sub_module \
             --with-http_v2_module \
             --with-http_v3_module \
-            --with-mail \
+            --with-mail=dynamic \
             --with-mail_ssl_module \
-            --with-stream \
+            --with-stream=dynamic \
+            --with-stream_geoip_module=dynamic \
             --with-stream_realip_module \
             --with-stream_ssl_module \
             --with-stream_ssl_preread_module \
             --with-http_geoip_module=dynamic \
             --with-http_image_filter_module=dynamic \
-            --with-http_xslt_module=dynamic \
             --with-http_perl_module=dynamic \
+            --with-http_xslt_module=dynamic
 
       - name: Build NGINX
         run: |
@@ -104,7 +106,7 @@ jobs:
       - name: Package NGINX with FPM
         run: |
           cd /etc/nginx
-          sudo fpm -s dir -t deb -n nginx -v ${VERSION} -C /etc/nginx -p /home/runner/work/nginx_plus/nginx_plus/nginx-${VERSION}.deb .
+          sudo fpm -s dir -t deb -n nginx -v ${VERSION} -C //nginx -p /home/runner/work/nginx_plus/nginx_plus/nginx-${VERSION}.deb .
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
           TMPDIR: /home/runner/work/nginx_plus/nginx_plus/tmp
