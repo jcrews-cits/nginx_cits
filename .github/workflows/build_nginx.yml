@@ -48,6 +48,14 @@ jobs:
         run: |
           git clone https://github.com/leev/ngx_http_geoip2_module.git
 
+      - name: Install Dependencies for VTS Module
+        run: |
+          sudo apt-get install -y libpcre3 libpcre3-dev
+
+      - name: Download nginx-module-vts
+        run: |
+          git clone https://github.com/vozlt/nginx-module-vts.git
+
       - name: Configure NGINX
         run: |
           cd nginx-$VERSION
@@ -99,6 +107,7 @@ jobs:
             --with-http_perl_module=dynamic \
             --with-http_xslt_module=dynamic \
             --add-dynamic-module=../ngx_http_geoip2_module
+            --add-dynamic-module=../nginx-module-vts
 
       - name: Build NGINX
         run: |
