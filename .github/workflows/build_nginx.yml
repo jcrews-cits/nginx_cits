@@ -124,8 +124,10 @@ jobs:
 
       - name: Package NGINX with FPM
         run: |
-          cd /etc/nginx
-          sudo fpm -s dir -t deb -n nginx -v $VERSION -C /etc/nginx -p /home/runner/work/nginx_plus/nginx_plus/nginx-$VERSION.deb .
+          sudo fpm -s dir -t deb -n nginx -v $VERSION -C / \
+            --prefix=/ \
+            -p /home/runner/work/nginx_plus/nginx_plus/nginx-$VERSION.deb \
+            etc/nginx usr/lib/nginx/modules var/log/nginx run var/lock/nginx.lock var/lib/nginx
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
           TMPDIR: /home/runner/work/nginx_plus/nginx_plus/tmp
