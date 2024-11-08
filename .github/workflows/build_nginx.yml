@@ -29,7 +29,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libssl-dev libpcre3-dev zlib1g-dev libgeoip-dev libgd-dev libxml2-dev libxslt1-dev libperl-dev
+          sudo apt-get install -y build-essential libssl-dev libpcre3-dev zlib1g-dev libgeoip-dev libgd-dev libxml2-dev libxslt1-dev libperl-dev libmaxminddb-dev mmdb-bin
           sudo gem install fpm
 
       - name: Download NGINX source code
@@ -39,6 +39,14 @@ jobs:
           ls -l nginx-$VERSION.tar.gz
           file nginx-$VERSION.tar.gz
           tar -xzvf nginx-$VERSION.tar.gz || { echo "Extraction failed"; exit 1; }
+
+      - name: Install GeoIP2 Dependencies
+        run: |
+          sudo apt-get install -y libmaxminddb-dev mmdb-bin
+
+      - name: Download ngx_http_geoip2_module
+        run: |
+          git clone https://github.com/leev/ngx_http_geoip2_module.git
 
       - name: Configure NGINX
         run: |
@@ -89,7 +97,8 @@ jobs:
             --with-http_geoip_module=dynamic \
             --with-http_image_filter_module=dynamic \
             --with-http_perl_module=dynamic \
-            --with-http_xslt_module=dynamic
+            --with-http_xslt_module=dynamic \
+            --add-dynamic-module=../ngx_http_geoip2_module
 
       - name: Build NGINX
         run: |
