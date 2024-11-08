@@ -126,8 +126,11 @@ jobs:
         run: |
           sudo fpm -s dir -t deb -n nginx -v $VERSION -C / \
             --prefix=/ \
+            --exclude=/run \
+            --exclude=/var/lib/nginx/tmp \
+            --exclude=/var/cache/nginx \
             -p /home/runner/work/nginx_plus/nginx_plus/nginx-$VERSION.deb \
-            etc/nginx usr/lib/nginx/modules var/log/nginx run var/lock/nginx.lock var/lib/nginx
+            etc/nginx usr/lib/nginx/modules var/log/nginx var/lib/nginx
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
           TMPDIR: /home/runner/work/nginx_plus/nginx_plus/tmp
