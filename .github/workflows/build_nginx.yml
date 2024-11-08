@@ -58,9 +58,9 @@ jobs:
 
       - name: Configure NGINX
         run: |
-          cd nginx-${{ env.VERSION }}
+          cd nginx-$VERSION
           ./configure \
-            --with-cc-opt="-g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/build/nginx-z26Olq/nginx-${{VERSION}}=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=/build/nginx-z26Olq/nginx-${{VERSION}}=/usr/src/nginx-${{VERSION}}-1 -fPIC -Wdate-time" \
+            --with-cc-opt="-g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/build/nginx-z26Olq/nginx-${VERSION}=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=/build/nginx-z26Olq/nginx-${VERSION}=/usr/src/nginx-${VERSION}-1 -fPIC -Wdate-time" \
             --with-ld-opt="-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -Wl,-z,relro -Wl,-z,now -fPIC" \
             --prefix=/etc/nginx \
             --conf-path=/etc/nginx/nginx.conf \
@@ -125,7 +125,7 @@ jobs:
       - name: Package NGINX with FPM
         run: |
           cd /etc/nginx
-          sudo fpm -s dir -t deb -n nginx -v ${VERSION} -C /etc/nginx -p /home/runner/work/nginx_plus/nginx_plus/nginx-${VERSION}.deb .
+          sudo fpm -s dir -t deb -n nginx -v $VERSION -C /etc/nginx -p /home/runner/work/nginx_plus/nginx_plus/nginx-$VERSION.deb .
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
           TMPDIR: /home/runner/work/nginx_plus/nginx_plus/tmp
@@ -139,6 +139,7 @@ jobs:
         with:
           name: "nginx-${{ env.VERSION }}.deb"
           path: "/home/runner/work/nginx_plus/nginx_plus/nginx-${{ env.VERSION }}.deb"
+
 
 #      - name: Create GitHub Release
 #        id: create_release  # ID for reference in the next step
