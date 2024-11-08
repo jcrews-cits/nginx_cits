@@ -106,7 +106,7 @@ jobs:
             --with-http_image_filter_module=dynamic \
             --with-http_perl_module=dynamic \
             --with-http_xslt_module=dynamic \
-            --add-dynamic-module=../ngx_http_geoip2_module
+            --add-dynamic-module=../ngx_http_geoip2_module \
             --add-dynamic-module=../nginx-module-vts
 
       - name: Build NGINX
