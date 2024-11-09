@@ -159,8 +159,8 @@ jobs:
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: "nginx-${VERSION}-${RELEASE}-cits.deb"
-          path: "/home/runner/work/nginx_cits/nginx_cits/nginx-${VERSION}-${RELEASE}-cits.deb"
+          name: "nginx-${{ env.VERSION }}-${{ env.RELEASE }}-cits.deb"
+          path: "/home/runner/work/nginx_cits/nginx_cits/nginx-${{ env.VERSION }}-${{ env.RELEASE }}-cits.deb"
 
 #      - name: Create GitHub Release
 #        id: create_release  # ID for reference in the next step
