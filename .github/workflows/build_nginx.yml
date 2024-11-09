@@ -120,8 +120,10 @@ jobs:
             --with-http_perl_module=dynamic \
             --with-http_xslt_module=dynamic \
             --add-module=../ngx_cache_purge \
-            --add-dynamic-module=../ngx_http_geoip2_module \
-            --add-dynamic-module=../nginx-module-vts
+            --add-module=../ngx_http_geoip2_module \
+            --add-module=../nginx-module-vts \
+            --add-module=../nginx-module-sts \
+            --add-module=../nginx-module-stream-sts
 
       - name: Build NGINX
         run: |
@@ -140,11 +142,11 @@ jobs:
         run: |
           sudo fpm -s dir -t deb -n nginx -v ${VERSION} \
             -C / \
-            -p /home/runner/work/nginx_plus/nginx_plus/nginx-${VERSION}.deb \
+            -p /home/runner/work/nginx_cits/nginx_cits/nginx-${VERSION}.deb \
             /etc/nginx /usr/sbin/nginx /usr/lib/nginx/modules
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-          TMPDIR: /home/runner/work/nginx_plus/nginx_plus/tmp
+          TMPDIR: /home/runner/work/nginx_cits/nginx_cits/tmp
 
       - name: Check if .deb Package Exists
         run: |
