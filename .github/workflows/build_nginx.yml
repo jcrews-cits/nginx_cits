@@ -57,6 +57,14 @@ jobs:
         run: |
           git clone https://github.com/vozlt/nginx-module-vts.git
 
+      - name: Download nginx-module-sts
+        run: |
+          git clone https://github.com/vozlt/nginx-module-sts.git
+
+      - name: Download nginx-module-stream-sts
+        run: |
+          git clone https://github.com/vozlt/nginx-module-stream-sts.git
+
       - name: Download ngx_cache_purge module
         run: |
           git clone https://github.com/FRiCKLE/ngx_cache_purge.git
