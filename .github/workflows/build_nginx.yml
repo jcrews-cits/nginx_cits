@@ -115,7 +115,6 @@ jobs:
             --with-mail \
             --with-mail_ssl_module \
             --with-stream \
-            --with-stream_upstream_module \
             --with-stream_geoip_module \
             --with-stream_realip_module \
             --with-stream_ssl_module \
