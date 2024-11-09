@@ -35,11 +35,10 @@ jobs:
 
       - name: Download NGINX source code
         run: |
-          echo "Downloading NGINX version: $VERSION"
-          curl -f -O http://nginx.org/download/nginx-$VERSION.tar.gz || { echo "Failed to download NGINX version $VERSION"; exit 1; }
-          ls -l nginx-$VERSION.tar.gz
-          file nginx-$VERSION.tar.gz
-          tar -xzvf nginx-$VERSION.tar.gz || { echo "Extraction failed"; exit 1; }
+          echo "Downloading NGINX version: ${{ env.VERSION }}"
+          curl -f -O http://nginx.org/download/nginx-${{ env.VERSION }}.tar.gz || { echo "Failed to download NGINX version ${{ env.VERSION }}"; exit 1; }
+          ls -l nginx-${{ env.VERSION }}.tar.gz
+          tar -xzvf nginx-${{ env.VERSION }}.tar.gz || { echo "Extraction failed"; exit 1; }
 
       - name: Install GeoIP2 Dependencies
         run: |
@@ -71,9 +70,9 @@ jobs:
 
       - name: Configure NGINX
         run: |
-          cd nginx-$VERSION
+          cd nginx-${{ env.VERSION }}
           ./configure \
-            --with-cc-opt="-g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/build/nginx-z26Olq/nginx-${VERSION}=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=/build/nginx-z26Olq/nginx-${VERSION}=/usr/src/nginx-${VERSION}-1 -fPIC -Wdate-time" \
+            --with-cc-opt="-g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/build/nginx-z26Olq/nginx-${{ env.VERSION }}=. -flto=auto -ffat-lto-objects -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=/build/nginx-z26Olq/nginx-${{ env.VERSION }}=/usr/src/nginx-${{ env.VERSION }}-1 -fPIC -Wdate-time" \
             --with-ld-opt="-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -Wl,-z,relro -Wl,-z,now -fPIC" \
             --prefix=/etc/nginx \
             --conf-path=/etc/nginx/nginx.conf \
@@ -121,8 +120,8 @@ jobs:
             --with-stream_ssl_preread_module \
             --with-http_geoip_module \
             --with-http_image_filter_module \
-            --with-http_perl_module\
-            --with-http_xslt_module\
+            --with-http_perl_module \
+            --with-http_xslt_module \
             --add-module=../ngx_cache_purge \
             --add-module=../ngx_http_geoip2_module \
             --add-module=../nginx-module-vts \
@@ -131,7 +130,7 @@ jobs:
 
       - name: Build NGINX
         run: |
-          cd nginx-$VERSION
+          cd nginx-${{ env.VERSION }}
           sudo make
           sudo make modules
           sudo make install
@@ -166,21 +165,21 @@ jobs:
           [Install]
           WantedBy=multi-user.target" | sudo tee /etc/systemd/system/nginx.service
 
-    - name: Create Logrotate Configuration
-      run: |
-        echo "/var/log/nginx/*.log {
-            daily
-            missingok
-            rotate 14
-            compress
-            delaycompress
-            notifempty
-            create 0640 www-data adm
-            sharedscripts
-            postrotate
-                [ -f /run/nginx.pid ] && kill -USR1 `cat /run/nginx.pid`
-            endscript
-        }" | sudo tee /etc/logrotate.d/nginx
+      - name: Create Logrotate Configuration
+        run: |
+          echo "/var/log/nginx/*.log {
+              daily
+              missingok
+              rotate 14
+              compress
+              delaycompress
+              notifempty
+              create 0640 www-data adm
+              sharedscripts
+              postrotate
+                  [ -f /run/nginx.pid ] && kill -USR1 `cat /run/nginx.pid`
+              endscript
+          }" | sudo tee /etc/logrotate.d/nginx
 
       - name: Create Post-Install Script
         run: |
@@ -189,12 +188,15 @@ jobs:
           systemctl enable nginx" | sudo tee post-install
           sudo chmod +x post-install
 
+      - name: Create Output Directory
+        run: mkdir -p /home/runner/work/nginx_cits/nginx_cits
+
       - name: Package NGINX with FPM
         run: |
-          sudo fpm -s dir -t deb -n nginx -v ${VERSION} \
-            --post-install post-install \
+          sudo fpm -s dir -t deb -n nginx -v ${{ env.VERSION }} \
+            --post-install ./post-install \
             -C / \
-            -p /home/runner/work/nginx_cits/nginx_cits/nginx-${VERSION}-${RELEASE}-cits.deb \
+            -p /home/runner/work/nginx_cits/nginx_cits/nginx-${{ env.VERSION }}-${{ env.RELEASE }}-cits.deb \
             /etc/nginx /usr/sbin/nginx /usr/lib/nginx/modules /etc/logrotate.d/nginx /etc/systemd/system/nginx.service
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
@@ -202,13 +204,14 @@ jobs:
 
       - name: Check if .deb Package Exists
         run: |
-          ls -l /home/runner/work/nginx_cits/nginx_cits/nginx-${{ env.VERSION }}-${{ env.RELEASE}}-cits.deb || { echo "Package not found"; exit 1; }
+          ls -l /home/runner/work/nginx_cits/nginx_cits/nginx-${{ env.VERSION }}-${{ env.RELEASE }}-cits.deb || { echo "Package not found"; exit 1; }
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3
         with:
           name: "nginx-${{ env.VERSION }}-${{ env.RELEASE }}-cits.deb"
           path: "/home/runner/work/nginx_cits/nginx_cits/nginx-${{ env.VERSION }}-${{ env.RELEASE }}-cits.deb"
+
 
 #      - name: Create GitHub Release
 #        id: create_release  # ID for reference in the next step
