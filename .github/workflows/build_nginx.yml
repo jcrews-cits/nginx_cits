@@ -93,7 +93,6 @@ jobs:
             --with-file-aio \
             --with-threads \
             --with-pcre \
-            --with-zlib \
             --with-libatomic \
             --with-http_degradation_module \
             --with-http_stub_status_module \
