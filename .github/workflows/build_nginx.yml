@@ -49,6 +49,16 @@ jobs:
         run: |
           git clone https://github.com/leev/ngx_http_geoip2_module.git
 
+<<<<<<< HEAD
+      - name: Install Dependencies for VTS Module
+        run: |
+          sudo apt-get install -y libpcre3 libpcre3-dev
+
+      - name: Download nginx-module-vts
+        run: |
+          git clone https://github.com/vozlt/nginx-module-vts.git
+
+=======
       - name: Install Dependencies for VTS Module
         run: |
           sudo apt-get install -y libpcre3 libpcre3-dev
@@ -138,16 +148,13 @@ jobs:
 
       - name: Package NGINX with FPM
         run: |
-          sudo fpm -s dir -t deb -n nginx -v $VERSION -C / \
-            --prefix=/ \
-            --exclude=/run \
-            --exclude=/var/lib/nginx/tmp \
-            --exclude=/var/cache/nginx \
-            -p /home/runner/work/nginx_cits/nginx_cits/nginx-$VERSION-$RELEASE-cits.deb \
-            etc/nginx usr/lib/nginx/modules var/log/nginx var/lib/nginx
+          sudo fpm -s dir -t deb -n nginx -v ${VERSION} \
+            -C / \
+            -p /home/runner/work/nginx_plus/nginx_plus/nginx-${VERSION}.deb \
+            /etc/nginx /usr/sbin/nginx /usr/lib/nginx/modules
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-          TMPDIR: /home/runner/work/nginx_cits/nginx_cits/tmp
+          TMPDIR: /home/runner/work/nginx_plus/nginx_plus/tmp
 
       - name: Check if .deb Package Exists
         run: |
