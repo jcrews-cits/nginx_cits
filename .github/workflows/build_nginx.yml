@@ -146,7 +146,7 @@ jobs:
         run: |
           sudo fpm -s dir -t deb -n nginx -v ${VERSION} \
             -C / \
-            -p /home/runner/work/nginx_cits/nginx_cits/nginx-${VERSION}.deb \
+            -p /home/runner/work/nginx_cits/nginx_cits/nginx-${VERSION}-${RELEASE}-cits.deb \
             /etc/nginx /usr/sbin/nginx /usr/lib/nginx/modules
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
