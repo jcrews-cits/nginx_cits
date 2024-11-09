@@ -142,12 +142,60 @@ jobs:
       - name: Create Temporary Directory
         run: mkdir -p /home/runner/work/nginx_cits/nginx_cits/tmp
 
+      - name: Create NGINX Systemd Service File
+        run: |
+          echo "[Unit]
+          Description=A high performance web server and a reverse proxy server
+          Documentation=https://nginx.org/en/docs/
+          After=network.target nss-lookup.target
+
+          [Service]
+          Type=forking
+          PIDFile=/run/nginx.pid
+          ExecStartPre=/usr/sbin/nginx -t -q -g 'daemon on; master_process on;'
+          ExecStart=/usr/sbin/nginx -g 'daemon on; master_process on;'
+          ExecReload=/usr/sbin/nginx -s reload
+          ExecStop=/bin/kill -s QUIT \$MAINPID
+
+          PrivateTmp=true
+          ProtectSystem=full
+          ProtectHome=true
+          NoNewPrivileges=true
+          RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+          [Install]
+          WantedBy=multi-user.target" | sudo tee /etc/systemd/system/nginx.service
+
+    - name: Create Logrotate Configuration
+      run: |
+        echo "/var/log/nginx/*.log {
+            daily
+            missingok
+            rotate 14
+            compress
+            delaycompress
+            notifempty
+            create 0640 www-data adm
+            sharedscripts
+            postrotate
+                [ -f /run/nginx.pid ] && kill -USR1 `cat /run/nginx.pid`
+            endscript
+        }" | sudo tee /etc/logrotate.d/nginx
+
+      - name: Create Post-Install Script
+        run: |
+          echo "#!/bin/bash
+          systemctl daemon-reload
+          systemctl enable nginx" | sudo tee post-install
+          sudo chmod +x post-install
+
       - name: Package NGINX with FPM
         run: |
           sudo fpm -s dir -t deb -n nginx -v ${VERSION} \
+            --post-install post-install \
             -C / \
             -p /home/runner/work/nginx_cits/nginx_cits/nginx-${VERSION}-${RELEASE}-cits.deb \
-            /etc/nginx /usr/sbin/nginx /usr/lib/nginx/modules
+            /etc/nginx /usr/sbin/nginx /usr/lib/nginx/modules /etc/logrotate.d/nginx /etc/systemd/system/nginx.service
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
           TMPDIR: /home/runner/work/nginx_cits/nginx_cits/tmp
