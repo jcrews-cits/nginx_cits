@@ -24,7 +24,8 @@ jobs:
         run: |
           VERSION=$(cat VERSION)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Version read from file: $VERSION"
+          RELEASE=$(cat RELEASE)
+          echo "RELEASE=$RELEASE" >> $GITHUB_ENV
 
       - name: Install Dependencies
         run: |
@@ -55,6 +56,10 @@ jobs:
       - name: Download nginx-module-vts
         run: |
           git clone https://github.com/vozlt/nginx-module-vts.git
+
+      - name: Download ngx_cache_purge module
+        run: |
+          git clone https://github.com/FRiCKLE/ngx_cache_purge.git
 
       - name: Configure NGINX
         run: |
@@ -106,6 +111,7 @@ jobs:
             --with-http_image_filter_module=dynamic \
             --with-http_perl_module=dynamic \
             --with-http_xslt_module=dynamic \
+            --add-module=../ngx_cache_purge \
             --add-dynamic-module=../ngx_http_geoip2_module \
             --add-dynamic-module=../nginx-module-vts
 
@@ -120,7 +126,7 @@ jobs:
         run: sudo chmod -R 755 /etc/nginx
 
       - name: Create Temporary Directory
-        run: mkdir -p /home/runner/work/nginx_plus/nginx_plus/tmp
+        run: mkdir -p /home/runner/work/nginx_cits/nginx_cits/tmp
 
       - name: Package NGINX with FPM
         run: |
@@ -129,21 +135,21 @@ jobs:
             --exclude=/run \
             --exclude=/var/lib/nginx/tmp \
             --exclude=/var/cache/nginx \
-            -p /home/runner/work/nginx_plus/nginx_plus/nginx-$VERSION.deb \
+            -p /home/runner/work/nginx_cits/nginx_cits/nginx-$VERSION-$RELEASE-cits.deb \
             etc/nginx usr/lib/nginx/modules var/log/nginx var/lib/nginx
         env:
           PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-          TMPDIR: /home/runner/work/nginx_plus/nginx_plus/tmp
+          TMPDIR: /home/runner/work/nginx_cits/nginx_cits/tmp
 
       - name: Check if .deb Package Exists
         run: |
-          ls -l /home/runner/work/nginx_plus/nginx_plus/nginx-${{ env.VERSION }}.deb || { echo "Package not found"; exit 1; }
+          ls -l /home/runner/work/nginx_cits/nginx_cits/nginx-${{ env.VERSION }}-${{ env.RELEASE}}-cits.deb || { echo "Package not found"; exit 1; }
 
       - name: Upload Package Artifact
         uses: actions/upload-artifact@v3
         with:
           name: "nginx-${{ env.VERSION }}.deb"
-          path: "/home/runner/work/nginx_plus/nginx_plus/nginx-${{ env.VERSION }}.deb"
+          path: "/home/runner/work/nginx_cits/nginx_cits/nginx-${{ env.VERSION }}-${{ env.RELEASE}}-cits.deb"
 
 
 #      - name: Create GitHub Release
@@ -162,7 +168,7 @@ jobs:
 #        uses: actions/upload-release-asset@v1
 #        with:
 #          upload_url: ${{ steps.create_release.outputs.upload_url }}
-#          asset_path: /home/runner/work/nginx_plus/nginx_plus/nginx-${{ env.VERSION }}.deb
+#          asset_path: /home/runner/work/nginx_cits/nginx_cits/nginx-${{ env.VERSION }}.deb
 #          asset_name: nginx-${{ env.VERSION }}.deb
 #          asset_content_type: application/octet-stream
 #        env:
