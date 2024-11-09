@@ -49,16 +49,6 @@ jobs:
         run: |
           git clone https://github.com/leev/ngx_http_geoip2_module.git
 
-<<<<<<< HEAD
-      - name: Install Dependencies for VTS Module
-        run: |
-          sudo apt-get install -y libpcre3 libpcre3-dev
-
-      - name: Download nginx-module-vts
-        run: |
-          git clone https://github.com/vozlt/nginx-module-vts.git
-
-=======
       - name: Install Dependencies for VTS Module
         run: |
           sudo apt-get install -y libpcre3 libpcre3-dev
