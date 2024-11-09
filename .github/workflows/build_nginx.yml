@@ -30,7 +30,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libssl-dev libpcre3-dev zlib1g-dev libgeoip-dev libgd-dev libxml2-dev libxslt1-dev libperl-dev
+          sudo apt-get install -y build-essential libssl-dev libpcre3-dev zlib1g-dev libgeoip-dev libgd-dev libxml2-dev libxslt1-dev libperl-dev libatomic-ops-dev
           sudo gem install fpm
 
       - name: Download NGINX source code
