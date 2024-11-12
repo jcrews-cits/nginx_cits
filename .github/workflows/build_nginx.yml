@@ -212,7 +212,6 @@ jobs:
           name: "nginx-${{ env.VERSION }}-${{ env.RELEASE }}-cits.deb"
           path: "/home/runner/work/nginx_cits/nginx_cits/nginx-${{ env.VERSION }}-${{ env.RELEASE }}-cits.deb"
 
-
 #      - name: Create GitHub Release
 #        id: create_release  # ID for reference in the next step
 #        uses: actions/create-release@v1
